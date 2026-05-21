@@ -1,0 +1,51 @@
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-2"
+}
+
+variable "project" {
+  description = "Project name"
+  type        = string
+  default     = "memos"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
+}
+
+variable "public_subnet_cidrs" {
+  description = "CIDR blocks for public subnets"
+  type        = list(string)
+}
+
+variable "private_subnet_cidrs" {
+  description = "CIDR blocks for private subnets"
+  type        = list(string)
+}
+
+variable "availability_zones" {
+  description = "Availability zones"
+  type        = list(string)
+}
+
+variable "ecs_cpu" {
+  description = "ECS task CPU units"
+  type        = number
+}
+
+variable "ecs_memory" {
+  description = "ECS task memory in MB"
+  type        = number
+}
+
+variable "desired_count" {
+  description = "Number of ECS tasks to run"
+  type        = number
+}
