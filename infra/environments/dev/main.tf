@@ -19,3 +19,64 @@ module "vpc" {
   private_subnet_cidrs = var.private_subnet_cidrs
   availability_zones   = var.availability_zones
 }
+
+module "ecr" {
+  source = "../../modules/ecr"
+
+  repository_name = var.project
+}
+
+module "iam" {
+  source = "../../modules/iam"
+
+  project     = var.project
+  environment = var.environment
+}
+
+module "acm" {
+  source = "../../modules/acm"
+
+  project        = var.project
+  environment    = var.environment
+  domain_name    = var.domain_name
+  hosted_zone_id = var.hosted_zone_id
+}
+
+module "alb" {
+  source = "../../modules/alb"
+
+  project           = var.project
+  environment       = var.environment
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  container_port    = var.container_port
+  certificate_arn   = module.acm.certificate_arn
+}
+
+module "ecs" {
+  source = "../../modules/ecs"
+
+  project                    = var.project
+  environment                = var.environment
+  aws_region                 = var.aws_region
+  vpc_id                     = module.vpc.vpc_id
+  private_subnet_ids         = module.vpc.private_subnet_ids
+  container_port             = var.container_port
+  ecs_cpu                    = var.ecs_cpu
+  ecs_memory                 = var.ecs_memory
+  desired_count              = var.desired_count
+  repository_url             = module.ecr.repository_url
+  ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
+  ecs_task_role_arn          = module.iam.ecs_task_role_arn
+  alb_security_group_id      = module.alb.alb_security_group_id
+  target_group_arn           = module.alb.target_group_arn
+}
+
+module "route53" {
+  source = "../../modules/route53"
+
+  hosted_zone_id = var.hosted_zone_id
+  domain_name    = var.domain_name
+  alb_dns_name   = module.alb.alb_dns_name
+  alb_zone_id    = module.alb.alb_zone_id
+}

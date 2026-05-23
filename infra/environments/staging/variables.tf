@@ -49,3 +49,18 @@ variable "desired_count" {
   description = "Number of ECS tasks to run"
   type        = number
 }
+variable "container_port" {
+  description = "Container port"
+  type        = number
+  default     = 8081
+}
+
+variable "domain_name" {
+  description = "Domain name for the application"
+  type        = string
+}
+
+variable "hosted_zone_id" {
+  description = "Route53 hosted zone ID"
+  type        = string
+}
