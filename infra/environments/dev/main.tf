@@ -88,6 +88,23 @@ module "ecs" {
   target_group_arn            = module.alb.target_group_arn
   db_driver                   = "postgres"
   db_connection               = module.rds.db_connection_string
+module "ecs" {
+  source = "../../modules/ecs"
+
+  project                    = var.project
+  environment                = var.environment
+  aws_region                 = var.aws_region
+  vpc_id                     = module.vpc.vpc_id
+  private_subnet_ids         = module.vpc.private_subnet_ids
+  container_port             = var.container_port
+  ecs_cpu                    = var.ecs_cpu
+  ecs_memory                 = var.ecs_memory
+  desired_count              = var.desired_count
+  repository_url             = module.ecr.repository_url
+  ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
+  ecs_task_role_arn          = module.iam.ecs_task_role_arn
+  alb_security_group_id      = module.alb.alb_security_group_id
+  target_group_arn           = module.alb.target_group_arn
 }
 
 module "route53" {
@@ -97,4 +114,5 @@ module "route53" {
   domain_name    = var.domain_name
   alb_dns_name   = module.alb.alb_dns_name
   alb_zone_id    = module.alb.alb_zone_id
+}
 }
