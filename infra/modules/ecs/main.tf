@@ -30,6 +30,7 @@ resource "aws_security_group" "ecs" {
     to_port         = var.container_port
     protocol        = "tcp"
     security_groups = [var.alb_security_group_id]
+    description     = "Allow traffic from ALB only"
   }
 
   egress {
@@ -79,6 +80,14 @@ resource "aws_ecs_task_definition" "main" {
         {
           name  = "MEMOS_PORT"
           value = tostring(var.container_port)
+        },
+        {
+          name  = "MEMOS_DRIVER"
+          value = var.db_driver
+        },
+        {
+          name  = "MEMOS_DSN"
+          value = var.db_connection
         }
       ]
     }
@@ -108,9 +117,15 @@ resource "aws_ecs_service" "main" {
     container_port   = var.container_port
   }
 
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
   depends_on = [var.alb_security_group_id]
 
   tags = {
     Name = "${var.project}-${var.environment}-service"
   }
 }
+

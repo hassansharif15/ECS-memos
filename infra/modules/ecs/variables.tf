@@ -74,3 +74,15 @@ variable "target_group_arn" {
   description = "ALB target group ARN"
   type        = string
 }
+
+variable "db_driver" {
+  description = "Database driver for memos"
+  type        = string
+  default     = "postgres"
+}
+
+variable "db_connection" {
+  description = "Database connection string"
+  type        = string
+  sensitive   = true
+}
