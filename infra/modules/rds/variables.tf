@@ -46,3 +46,9 @@ variable "db_allocated_storage" {
   type        = number
   default     = 20
 }
+
+variable "multi_az" {
+  description = "Enable Multi-AZ for RDS"
+  type        = bool
+  default     = false
+}
