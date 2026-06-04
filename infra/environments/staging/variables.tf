@@ -64,3 +64,15 @@ variable "hosted_zone_id" {
   description = "Route53 hosted zone ID"
   type        = string
 }
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage in GB"
+  type        = number
+  default     = 20
+}
