@@ -13,11 +13,6 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "private_subnet_ids" {
-  description = "Private subnet IDs for RDS"
-  type        = list(string)
-}
-
 variable "ecs_security_group_id" {
   description = "ECS security group ID - only this can talk to RDS"
   type        = string
@@ -51,4 +46,8 @@ variable "multi_az" {
   description = "Enable Multi-AZ for RDS"
   type        = bool
   default     = false
+}
+variable "database_subnet_ids" {
+  description = "Database subnet IDs for RDS"
+  type        = list(string)
 }

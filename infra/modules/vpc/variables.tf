@@ -31,3 +31,8 @@ variable "environment" {
   description = "Environment name for tagging"
   type        = string
 }
+
+variable "database_subnet_cidrs" {
+  description = "CIDR blocks for database subnets"
+  type        = list(string)
+}

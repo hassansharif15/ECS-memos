@@ -76,3 +76,14 @@ variable "db_allocated_storage" {
   type        = number
   default     = 20
 }
+
+variable "database_subnet_cidrs" {
+  description = "CIDR blocks for database subnets"
+  type        = list(string)
+}
+
+variable "multi_az" {
+  description = "Enable Multi-AZ for RDS"
+  type        = bool
+  default     = false
+}

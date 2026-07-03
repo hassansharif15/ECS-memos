@@ -16,12 +16,13 @@ terraform {
 module "vpc" {
   source = "../../modules/vpc"
 
-  project              = var.project
-  environment          = var.environment
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-  availability_zones   = var.availability_zones
+  project               = var.project
+  environment           = var.environment
+  vpc_cidr              = var.vpc_cidr
+  public_subnet_cidrs   = var.public_subnet_cidrs
+  private_subnet_cidrs  = var.private_subnet_cidrs
+  database_subnet_cidrs = var.database_subnet_cidrs
+  availability_zones    = var.availability_zones
 }
 
 module "ecr" {
@@ -63,10 +64,11 @@ module "rds" {
   project               = var.project
   environment           = var.environment
   vpc_id                = module.vpc.vpc_id
-  private_subnet_ids    = module.vpc.private_subnet_ids
+  database_subnet_ids   = module.vpc.database_subnet_ids
   ecs_security_group_id = module.ecs.ecs_security_group_id
   db_instance_class     = var.db_instance_class
   db_allocated_storage  = var.db_allocated_storage
+  multi_az              = var.multi_az
 }
 
 module "ecs" {

@@ -42,6 +42,24 @@ resource "aws_subnet" "private" {
   }
 }
 
+resource "aws_subnet" "database" {
+  count             = length(var.database_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.database_subnet_cidrs[count.index]
+  availability_zone = var.availability_zones[count.index]
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "${var.project}-database-subnet-${count.index + 1}"
+  }
+}
+
+resource "aws_route_table_association" "database" {
+  count          = length(var.database_subnet_cidrs)
+  subnet_id      = aws_subnet.database[count.index].id
+  route_table_id = aws_route_table.private.id
+}
+
 resource "aws_eip" "nat" {
   domain = "vpc"
 
