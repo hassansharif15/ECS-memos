@@ -89,6 +89,7 @@ module "ecs" {
   target_group_arn            = module.alb.target_group_arn
   db_driver                   = "postgres"
   db_connection               = module.rds.db_connection_string
+  image_tag                   = var.image_tag
 }
 
 module "route53" {
