@@ -76,3 +76,9 @@ variable "db_allocated_storage" {
   type        = number
   default     = 20
 }
+
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+  default     = "latest"
+}
