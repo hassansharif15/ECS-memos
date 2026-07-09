@@ -1,0 +1,83 @@
+name: Terraform Apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to apply'
+        required: true
+        type: choice
+        options: [dev, staging, prod]
+        default: prod
+  workflow_run:
+    workflows: ["Terraform Plan"]
+    types: [completed]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    env:
+      ENVIRONMENT: ${{ inputs.environment || 'prod' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::600929978069:role/github-actions-memos
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.8
+
+      - name: Terraform init
+        working-directory: infra/environments/${{ env.ENVIRONMENT }}
+        run: terraform init -input=false
+
+      - name: Terraform apply
+        working-directory: infra/environments/${{ env.ENVIRONMENT }}
+        run: terraform apply -input=false -auto-approve -var="image_tag=${{ github.sha }}"
+
+      - name: Set health URL
+        id: health-url
+        run: |
+          if [ "${{ env.ENVIRONMENT }}" == "dev" ]; then echo "url=https://tm.devopsbyhassan.com" >> $GITHUB_OUTPUT; fi
+          if [ "${{ env.ENVIRONMENT }}" == "staging" ]; then echo "url=https://tm-staging.devopsbyhassan.com" >> $GITHUB_OUTPUT; fi
+          if [ "${{ env.ENVIRONMENT }}" == "prod" ]; then echo "url=https://tm-prod.devopsbyhassan.com" >> $GITHUB_OUTPUT; fi
+
+      - name: Wait for service to stabilise
+        run: sleep 60
+
+      - name: Health check
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.health-url.outputs.url }})
+          echo "HTTP status: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Health check failed with status $STATUS"
+            exit 1
+          fi
+          echo "Health check passed"
+
+      - name: Job summary
+        run: |
+          echo "## Apply Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL:** ${{ steps.health-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Health check:** Passed ✅" >> $GITHUB_STEP_SUMMARY
