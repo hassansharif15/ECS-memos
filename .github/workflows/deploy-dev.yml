@@ -42,7 +42,7 @@ jobs:
 
       - name: Terraform init
         working-directory: ${{ env.TF_DIR }}
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform validate
         working-directory: ${{ env.TF_DIR }}
@@ -50,7 +50,7 @@ jobs:
 
       - name: Terraform plan
         working-directory: ${{ env.TF_DIR }}
-        run: terraform plan -var="image_tag=${{ github.sha }}" -out=tfplan
+        run: terraform plan -input=false -var="image_tag=${{ github.sha }}" -out=tfplan
 
       - name: Terraform apply
         working-directory: ${{ env.TF_DIR }}

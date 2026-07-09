@@ -1,0 +1,10 @@
+environment          = "prod"
+aws_region           = "eu-west-2"
+project              = "memos"
+vpc_cidr             = "10.2.0.0/16"
+public_subnet_cidrs  = ["10.2.1.0/24", "10.2.2.0/24"]
+private_subnet_cidrs = ["10.2.3.0/24", "10.2.4.0/24"]
+availability_zones   = ["eu-west-2a", "eu-west-2b"]
+ecs_cpu              = 1024
+ecs_memory           = 2048
+desired_count        = 2
