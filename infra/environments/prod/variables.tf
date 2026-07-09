@@ -81,3 +81,9 @@ variable "multi_az" {
   type        = bool
   default     = false
 }
+
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+  default     = "latest"
+}
